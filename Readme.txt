@@ -23,9 +23,23 @@
 * LoginScreen.js
     npm i react-native-paper //import {TextInput} from 'react-native-paper';
     npm i @react-native-async-storage/async-storage
-----------------------------------------------------------
+------------------------------------------
 * RegisterScreen.js
     npm i react-native-image-crop-picker /import ImagePicker from 'react-native-image-crop-picker';
+------------------------------------------
+* MaterialBottomNavigation
+    npm i @react-navigation/material-bottom-tabs /import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+    ----
+     npm i react-native-vector-icons //Іконки (імпортуються з /node_modules/react-native-vector-icons/Fonts в android/app/src/main/assets/fonts
+
+------------------------------------------
+* renderCategor.js.....
+    npm i react-native-sqlite-storage
+------------------------------------------
+* AddProductScreen.js
+    npm i react-native-searchable-dropdown
+------------------------------------------
+
 
 
 

@@ -12,6 +12,8 @@ target 'rnbegin8_sqllite_login_prodcat' do
     :hermes_enabled => false
   )
 
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   target 'rnbegin8_sqllite_login_prodcatTests' do
     inherit! :complete
     # Pods for testing

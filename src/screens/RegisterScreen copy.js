@@ -1,215 +1,296 @@
 //RegisterScreen.js
+//
 import React, {useState, useEffect} from 'react';
 
 import {
   StyleSheet,
-  View,
   Text,
-  ScrollView,
   TouchableOpacity,
-  SafeAreaView,
-  KeyboardAvoidingView,
+  ScrollView,
+  View,
+  Image,
 } from 'react-native';
 
 import {TextInput} from 'react-native-paper';
-
+import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LoginScreen = ({navigation}) => {
-  // constructor(props) {
-  //   super(props);
-  //   this.emailRef = React.createRef();
-  //   this.passwordRef = React.createRef();
-  //   this.state = {
-  //     userEmail: '',
-  //     userPassword: '',
-  //     errorText: 'Error in Value',
-  //     actualEmail: '',
-  //     actualPassword: '',
-  //     navigation: this.props.navigation,
-  //   };
-  // }
-
-  // componentDidMount = async () => {
-  //   await AsyncStorage.getItem('userEmail').then(value =>
-  //     this.setState({actualEmail: value}),
-  //   );
-  //   await AsyncStorage.getItem('userPassword').then(value =>
-  //     this.setState({actualPassword: value}),
-  //   );
-
-  //   // alert(this.state.actualEmail + ", " + this.state.actualPassword)
-  // };
-
-  // const emailRef = React.createRef();
-  // const passwordRef = React.createRef();
-  const [userEmail, setUserEmail] = useState('');
-  const [userPassword, setUserPassword] = useState('');
-  const [errorText, setErrorText] = useState('');
+const RegisterScreen = ({navigation}) => {
+  const nameRef = React.createRef(); //Для переводу  фокусу на це поле
+  const emailRef = React.createRef();
+  const passwordRef = React.createRef();
+  const confirmPasswordRef = React.createRef();
+  const mobileRef = React.createRef();
+  const bdateRef = React.createRef();
+  const [imageURI, setImageURI] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [bdate, setBdate] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [mobileError, setMobileError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  //*--------------------
   const [actualEmail, setActualEmail] = useState('');
   const [actualPassword, setActualPassword] = useState('');
-
-  useEffect(() => {
-    getData();
-  }, []);
-
   const getData = async () => {
     try {
-      await AsyncStorage.getItem('userEmail').then(value =>
+      await AsyncStorage.getItem('userName').then(value =>
         setActualEmail(value),
       );
-      await AsyncStorage.getItem('userPassword').then(value =>
-        setActualPassword(value),
-      );
+      // await AsyncStorage.getItem('userPassword').then(value =>
+      //   setActualPassword(value),
+      // );
+      console.log('userName=', actualEmail + '/userPassword=', actualPassword);
     } catch (e) {
       console.log(e);
     }
   };
+  const showData = async () => {
+    // let {name, email, mobile, password, confirmPassword, bdate, imageURI} =
+    //   this.state;
 
-  const dataValidation = () => {
-    let passwordRegex =
-      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
     let emailRegex =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    let passwordRegex =
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+    // let phoneRegex = /^(\+38[\-\s]?)?[0]?(91)?[789]\d{9}$/;
+    let phoneRegex =
+      /^([+]39)?((3[\d]{2})([ ,\-,\/]){0,1}([\d, ]{6,9}))|(((0[\d]{1,4}))([ ,\-,\/]){0,1}([\d, ]{5,10}))$/;
 
-    if (emailRegex.test(userEmail)) {
-      if (passwordRegex.test(userPassword)) {
-        AsyncStorage.setItem('isAuth', 'true');
-        if (actualEmail === userEmail && actualPassword === userPassword) {
-          return navigation.replace('MaterialBottomNavigation');
-        } else {
-          setUserEmail('');
-          setUserPassword('');
-          setErrorText('User not Registered');
-          return alert(errorText);
+    if (emailRegex.test(email)) {
+      setMobileError(false);
+      if (phoneRegex.test(mobile)) {
+        setMobileError(false);
+        if (passwordRegex.test(password)) {
+          setPasswordError(true);
+          console.log
+          if (password === confirmPassword) {
+            setPasswordError(false);
+            setConfirmPasswordError(false);
+            console.log('setItem11111=');
+            await AsyncStorage.setItem('userName', name);
+            // await AsyncStorage.setItem('userEmail', email);
+            // await AsyncStorage.setItem('userPassword', password);
+            // await AsyncStorage.setItem('userMobile', mobile);
+            // await AsyncStorage.setItem('userDOB', bdate);
+            // await AsyncStorage.setItem('userImage', imageURI);
+            // await AsyncStorage.setItem('isAuth', 'true');
+            console.log('setItem=');
+            getData();
+            return navigation.replace('MaterialBottomNavigation');
+            // return navigation.replace('ScreenB');
+          }
         }
-      } else {
-        setUserEmail('');
-        setUserPassword('');
-        setErrorText('User not Registered');
-        return alert(errorText);
+        setPassword('');
+        setConfirmPassword('');
+        setPasswordError(true);
+        setConfirmPasswordError(true);
+        return alert('Password Not Matching');
       }
-    } else {
-      setUserEmail('');
-      setUserPassword('');
-      setErrorText('Email is incorrect');
-      return alert(errorText);
+      setMobile('');
+      setMobileError(true);
+      return alert('Mobile Number Incorrect');
     }
+    setEmailError(true);
+    return alert('Email Incorrect');
+  };
+
+  const selectProfilePhoto = () => {
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      setImageURI(image.path);
+    });
+
+    return null;
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
-      <KeyboardAvoidingView style={{flex: 1}}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <View style={styles.headingStyles}>
-            <Text style={styles.title}>Welcome Back!</Text>
-            <Text style={styles.subTitle}>
-              Enter your credentials to continue
-            </Text>
-          </View>
-
-          {/* Login Part */}
-          <View style={{flex: 3}}>
-            <ScrollView
-              style={{marginHorizontal: 20}}
-              showsVerticalScrollIndicator={false}>
-              {/* Email Address */}
-              <View>
-                <TextInput
-                  mode="flat"
-                  label="Email"
-                  style={styles.inputStyles}
-                  // ref={emailRef}
-                  value={userEmail}
-                  // onChangeText={userEmail => setUserEmail(userEmail)}
-                  onChangeText={value => setUserEmail(value)}
-                  placeholder="Enter Email"
-                  keyboardType="email-address"
-                  returnKeyType="next"
-                  onSubmitEditing={() => passwordRef.current.focus()}
-                  blurOnSubmit={false}
-                />
-              </View>
-
-              {/* Password */}
-              <View>
-                <TextInput
-                  mode="flat"
-                  label="Password"
-                  style={styles.inputStyles}
-                  // ref={passwordRef}
-                  value={userPassword}
-                  // onChangeText={userPassword => this.setState({userPassword})}
-                  onChangeText={value => setUserPassword(value)}
-                  secureTextEntry={true}
-                  placeholder="Enter Password"
-                  returnKeyType="done"
-                />
-              </View>
-
-              {/* Login Button */}
-              <TouchableOpacity
-                style={styles.buttonStyle}
-                activeOpacity={0.5}
-                onPress={dataValidation}>
-                <Text>Login</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-
-          {/* Register Part */}
-          <View style={{marginHorizontal: 10}}>
-            <TouchableOpacity
-              style={styles.registerButtonStyle}
-              activeOpacity={0.5}
-              onPress={() => {
-                setUserEmail('');
-                setUserPassword('');
-                setErrorText('');
-                navigation.navigate('RegisterScreen');
-              }}>
-              <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
-                OPS... I DON'T HAVE AN ACCOUNT YET
-              </Text>
-            </TouchableOpacity>
-          </View>
+    <View style={{flex: 1, backgroundColor: 'cyan'}}>
+      <ScrollView
+        style={{margin: 15, borderRadius: 30, backgroundColor: '#fff'}}
+        showsVerticalScrollIndicator={false}>
+        <View style={{marginTop: 20, marginLeft: 20}}>
+          <Text style={styles.heading}>Hello!</Text>
+          <Text style={styles.heading}>SignUp To</Text>
+          <Text style={styles.heading}>Get Started</Text>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        <View style={styles.imageStruct}>
+          <TouchableOpacity onPress={() => selectProfilePhoto()}>
+            {imageURI === '' ? (
+              <Image
+                source={require('../assets/icon.png')}
+                style={styles.userImage}
+              />
+            ) : (
+              <Image source={{uri: imageURI}} style={styles.userImage} />
+            )}
+          </TouchableOpacity>
+          <Text style={{fontWeight: 'bold'}}>(Select Photo)</Text>
+        </View>
+
+        {/* Name */}
+        <View style={styles.details}>
+          <TextInput
+            mode="outlined"
+            label="Name"
+            placeholder="Name"
+            returnKeyType="next"
+            blurOnSubmit={false}
+            ref={nameRef} //Для переводу  фокусу на це поле
+            value={name}
+            onChangeText={name => setName(name)}
+            onSubmitEditing={() => emailRef.current.focus()} //Фокус на поле emailRef
+            style={styles.inputStyles}
+          />
+        </View>
+
+        {/* Email Address */}
+        <View style={styles.details}>
+          <TextInput
+            mode="outlined"
+            label="Email Address"
+            placeholder="Email Address"
+            returnKeyType="next"
+            blurOnSubmit={false}
+            error={emailError}
+            ref={emailRef}
+            value={email}
+            onChangeText={email => setEmail(email)}
+            onSubmitEditing={() => passwordRef.current.focus()}
+            style={styles.inputStyles}
+          />
+        </View>
+
+        {/* Password */}
+        <View style={styles.details}>
+          <TextInput
+            mode="outlined"
+            label="Password"
+            placeholder="Password"
+            returnKeyType="next"
+            blurOnSubmit={false}
+            error={passwordError}
+            ref={passwordRef}
+            value={password}
+            secureTextEntry={true}
+            onChangeText={password => setPassword(password)}
+            onSubmitEditing={() => confirmPasswordRef.current.focus()}
+            style={styles.inputStyles}
+          />
+        </View>
+
+        {/* Confirm Password */}
+        <View style={styles.details}>
+          <TextInput
+            mode="outlined"
+            label="Confirm Password"
+            placeholder="Confirm Password"
+            returnKeyType="next"
+            blurOnSubmit={false}
+            error={confirmPasswordError}
+            ref={confirmPasswordRef}
+            value={confirmPassword}
+            secureTextEntry={true}
+            onChangeText={confirmPassword =>
+              setConfirmPassword(confirmPassword)
+            }
+            onSubmitEditing={() => mobileRef.current.focus()}
+            style={styles.inputStyles}
+          />
+        </View>
+
+        {/* Mobile */}
+        <View style={styles.details}>
+          <TextInput
+            mode="outlined"
+            label="Phone Number"
+            returnKeyType="next"
+            placeholder="Phone Number"
+            keyboardType="phone-pad"
+            blurOnSubmit={false}
+            maxLength={10}
+            error={mobileError}
+            ref={mobileRef}
+            value={mobile}
+            onChangeText={mobile => setMobile(mobile)}
+            onSubmitEditing={() => bdateRef.current.focus()}
+            style={styles.inputStyles}
+          />
+        </View>
+
+        {/* Date of Birth */}
+        <View style={styles.details}>
+          <TextInput
+            mode="outlined"
+            label="Date of Birth"
+            placeholder="DD-MM-YYYY"
+            keyboardType="numeric"
+            returnKeyType="done"
+            ref={bdateRef}
+            value={bdate}
+            onChangeText={bdate => {
+              let bdateUpdate = bdate;
+              if (bdate.length === 2 || bdate.length === 5) {
+                bdateUpdate = bdateUpdate + '-';
+              }
+              setBdate(bdateUpdate);
+            }}
+            style={styles.inputStyles}
+            maxLength={10}
+          />
+        </View>
+
+        <View style={{marginHorizontal: 30, marginTop: 20}}>
+          <TouchableOpacity
+            onPress={() => showData()}
+            style={{
+              paddingVertical: 15,
+              backgroundColor: '#000',
+              paddingHorizontal: 20,
+              borderRadius: 20,
+            }}>
+            <Text style={{textAlign: 'center', color: '#fff'}}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
-export default LoginScreen;
+
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
-  headingStyles: {
-    flex: 2,
-    justifyContent: 'center',
-    marginLeft: 30,
-  },
-  title: {
-    fontSize: 25,
+  heading: {
+    fontSize: 30,
     fontWeight: 'bold',
-    marginVertical: 10,
+    color: '#1B0F30',
+    marginLeft: 20,
   },
-  subTitle: {
-    fontSize: 17,
-    color: 'grey',
+  imageStruct: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  userImage: {
+    height: 100,
+    width: 100,
+    backgroundColor: '#0bc4d9',
+    borderRadius: 20,
+    marginBottom: 5,
+  },
+  details: {
+    padding: 10,
   },
   inputStyles: {
-    marginVertical: 10,
-    backgroundColor: '#38c9cd',
-  },
-  buttonStyle: {
-    marginVertical: 20,
-    padding: 20,
-    backgroundColor: 'lightcyan',
-    borderRadius: 30,
-  },
-  registerButtonStyle: {
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderRadius: 30,
-    borderColor: '#babcbe',
-    paddingVertical: 15,
+    height: 40,
   },
 });

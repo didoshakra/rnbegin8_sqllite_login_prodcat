@@ -8,6 +8,7 @@ import ScreenB from '../screens/ScreenB';
 import Login from '../screens/Login';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import MaterialBottomNavigation from '../screens/MaterialBottomNavigation';
 
 const Stack = createStackNavigator();
 
@@ -32,6 +33,10 @@ export const RootNavigator = () => {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+      <Stack.Screen
+        name="MaterialBottomNavigation"
+        component={MaterialBottomNavigation}
+      />
     </Stack.Navigator>
   );
 };

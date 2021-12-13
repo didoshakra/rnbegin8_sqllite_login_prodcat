@@ -23,22 +23,19 @@ const LoginScreen = ({navigation}) => {
   const [actualEmail, setActualEmail] = useState('');
   const [actualPassword, setActualPassword] = useState('');
 
-  //*---------------------------------------------------------------------
   useEffect(() => {
     getData();
   }, []);
+
   const getData = async () => {
     try {
-      const value = await AsyncStorage.getItem('UserData'); //обєкти
-      console.log('value=', value);
-      if (value !== null) {
-        let user = JSON.parse(value); //обєкт
-        console.log('setActualEmail=', user.userEmail);
-        console.log('setActualPassword=', user.userPassword);
-        setActualEmail(user.userEmail);
-        setActualPassword(user.userPassword);
-        // return navigation.replace('MaterialBottomNavigation');
-      }
+      await AsyncStorage.getItem('userEmail').then(value =>
+        setActualEmail(value),
+      );
+      await AsyncStorage.getItem('userPassword').then(value =>
+        setActualPassword(value),
+      );
+      console.log('userEmail=', actualEmail + '/userPassword=', actualPassword);
     } catch (e) {
       console.log(e);
     }
@@ -49,17 +46,11 @@ const LoginScreen = ({navigation}) => {
       /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
     let emailRegex =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
     if (emailRegex.test(userEmail)) {
       if (passwordRegex.test(userPassword)) {
         AsyncStorage.setItem('isAuth', 'true');
-        console.log('actualEmail=', actualEmail + '/ userEmail=', userEmail);
-        console.log(
-          'actualPassword=',
-          actualPassword + '/ userPassword=',
-          userPassword,
-        );
         if (actualEmail === userEmail && actualPassword === userPassword) {
-          // *******************************************************
           return navigation.replace('MaterialBottomNavigation');
         } else {
           setUserEmail('');
@@ -151,8 +142,7 @@ const LoginScreen = ({navigation}) => {
                 navigation.navigate('RegisterScreen');
               }}>
               <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
-                {/* OPS... I DON'T HAVE AN ACCOUNT YET */}
-                Register
+                OPS... I DON'T HAVE AN ACCOUNT YET
               </Text>
             </TouchableOpacity>
           </View>
